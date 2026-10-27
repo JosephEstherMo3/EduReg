@@ -1990,3 +1990,485 @@
     flex-wrap: wrap;
   }
 }
+
+/* ==============================================================================
+   IMAGE 1 — Student Profile Record Details View Styles
+   ============================================================================== */
+.student-profile-page-container {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* Top Navigation & Actions Bar */
+.profile-top-controls-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.back-to-directory-btn {
+  display: inline-flex;
+  align-items: center;
+  color: #f8fafc;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  background: transparent;
+  transition: color 0.15s ease;
+}
+
+.back-to-directory-btn:hover {
+  color: #818cf8;
+}
+
+.profile-top-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.profile-action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  padding: 7px 14px;
+  border-radius: 8px;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.profile-btn-outline {
+  background: #09122c;
+  color: #f8fafc;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.profile-btn-outline:hover {
+  background: #0f1c45;
+  border-color: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+}
+
+/* Profile Hero Banner */
+.profile-hero-banner {
+  background: linear-gradient(135deg, #0d163d 0%, #0a112e 100%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 18px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  position: relative;
+  overflow: hidden;
+}
+
+.profile-hero-left {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.profile-large-avatar-circle {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: #5850ec;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 14px rgba(88, 80, 236, 0.4);
+  flex-shrink: 0;
+}
+
+.profile-hero-identity {
+  display: flex;
+  flex-direction: column;
+}
+
+.profile-hero-name {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: #ffffff;
+  line-height: 1.2;
+}
+
+.profile-hero-sub-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.profile-hero-id {
+  font-size: 0.8125rem;
+  color: #94a3b8;
+}
+
+.profile-hero-registered-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #0c1736;
+  border: 1px solid #1a2d66;
+  border-radius: 20px;
+  padding: 2px 9px;
+  font-size: 0.6875rem;
+  color: #a5b4fc;
+  font-weight: 500;
+}
+
+.registered-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background-color: #10b981;
+}
+
+.profile-hero-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+.status-pill-active {
+  display: inline-flex;
+  align-items: center;
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  border-radius: 20px;
+  padding: 3px 10px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #34d399;
+}
+
+.profile-hero-term-label {
+  font-size: 0.72rem;
+  color: #64748b;
+}
+
+/* Two Column Details Grid */
+.profile-details-grid-two {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 14px;
+  align-items: start;
+}
+
+.profile-card {
+  background-color: #070f26;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+}
+
+/* Left Card: QR Code + 8 Detail Rows */
+.profile-main-info-card {
+  padding: 20px;
+}
+
+.profile-info-inner-split {
+  display: grid;
+  grid-template-columns: 160px 1fr;
+  gap: 22px;
+  align-items: start;
+}
+
+.profile-qr-box-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.profile-qr-white-card {
+  background: #ffffff;
+  border-radius: 10px;
+  padding: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+  width: 146px;
+  height: 146px;
+}
+
+.profile-qr-svg-holder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.profile-qr-svg-holder svg {
+  width: 100%;
+  height: 100%;
+}
+
+.profile-qr-scan-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  padding: 5px 12px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #1e293b;
+  width: 100%;
+  max-width: 146px;
+  cursor: default;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.profile-fields-list-col {
+  display: flex;
+  flex-direction: column;
+}
+
+.profile-field-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.profile-field-row:last-child {
+  border-bottom: none;
+}
+
+.field-icon-wrap {
+  width: 20px;
+  display: flex;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.field-data-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  flex: 1;
+}
+
+.field-label-text {
+  font-size: 0.6875rem;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.field-value-text {
+  font-size: 0.8125rem;
+  color: #f1f5f9;
+  font-weight: 500;
+  word-break: break-all;
+}
+
+.student-id-dark-pill {
+  display: inline-flex;
+  align-items: center;
+  background: #0c1736;
+  border: 1px solid #2563eb;
+  border-radius: 6px;
+  padding: 3px 10px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #93c5fd;
+  max-width: fit-content;
+}
+
+.course-purple-pill {
+  display: inline-flex;
+  align-items: center;
+  background: #4f46e5;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 14px;
+  padding: 3px 12px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #ffffff;
+  max-width: fit-content;
+}
+
+/* Right Side Stacked Cards */
+.profile-side-cards-col {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.profile-academic-card,
+.profile-status-card,
+.profile-actions-card {
+  padding: 16px 18px;
+}
+
+.profile-card-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.card-header-icon-circle {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.profile-card-title {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+/* Card 1: Academic Information Subboxes */
+.academic-subcards-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.academic-subbox {
+  background: #08122c;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 8px;
+  padding: 10px 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.subbox-icon-square {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  background: rgba(99, 102, 241, 0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.subbox-text-wrap {
+  display: flex;
+  flex-direction: column;
+}
+
+.subbox-label {
+  font-size: 0.6875rem;
+  color: #64748b;
+}
+
+.subbox-value {
+  font-size: 0.8125rem;
+  color: #ffffff;
+  line-height: 1.2;
+}
+
+/* Card 2: Registration Status Green Box */
+.registration-status-green-box {
+  background: rgba(16, 185, 129, 0.08);
+  border: 1px solid #10b981;
+  border-radius: 8px;
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.status-green-icon-wrap {
+  flex-shrink: 0;
+}
+
+.status-green-text-col {
+  display: flex;
+  flex-direction: column;
+}
+
+.status-green-heading {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.status-green-desc {
+  font-size: 0.72rem;
+  color: #94a3b8;
+  margin-top: 1px;
+}
+
+/* Card 3: Quick Actions Buttons */
+.quick-actions-btns-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px;
+}
+
+.quick-action-pill-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 8px 10px;
+  border-radius: 8px;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.quick-action-btn-outline {
+  background: #09122c;
+  color: #f8fafc;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.quick-action-btn-outline:hover {
+  background: #0f1c45;
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.quick-action-btn-purple {
+  background: #4f46e5;
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 2px 8px rgba(79, 70, 229, 0.4);
+}
+
+.quick-action-btn-purple:hover {
+  background: #4338ca;
+}
+
+@media (max-width: 1024px) {
+  .profile-details-grid-two {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .profile-info-inner-split {
+    grid-template-columns: 1fr;
+  }
+
+  .quick-actions-btns-row {
+    grid-template-columns: 1fr;
+  }
+
+  .academic-subcards-row {
+    grid-template-columns: 1fr;
+  }
+}
+

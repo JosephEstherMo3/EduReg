@@ -23,6 +23,7 @@ import {
 } from 'lucide-react';
 import { StudentRegistrationForm } from './components/StudentRegistrationForm';
 import { StudentDirectory } from './components/StudentDirectory';
+import { StudentProfileDetailsView } from './components/StudentProfileDetailsView';
 import type { Student } from './types/student';
 import './App.css';
 
@@ -30,6 +31,7 @@ type NavSection = 'dashboard' | 'students' | 'courses' | 'registrations' | 'repo
 
 function App() {
   const [activeSection, setActiveSection] = useState<NavSection>('students');
+  const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
   const [refreshKey, setRefreshKey] = useState<number>(0);
   const [lastRegistered, setLastRegistered] = useState<Student | null>({
     id: 'sample-latest-id',
@@ -57,6 +59,9 @@ function App() {
 
   const navigateTo = (section: NavSection) => {
     setActiveSection(section);
+    if (section === 'students') {
+      setSelectedStudent(null);
+    }
     setIsMobileMenuOpen(false);
   };
 
@@ -290,14 +295,26 @@ function App() {
         {/* Main Content Viewport */}
         <main className="enterprise-main-viewport">
           {/* ==========================================================================
-              VIEW: Students Directory (Screen 1)
+              VIEW: Students Directory (Screen 1) or Student Details (Image 1)
               ========================================================================== */}
           {activeSection === 'students' && (
-            <StudentDirectory
-              refreshKey={refreshKey}
-              onRegisterClick={() => setActiveSection('registrations')}
-              externalSearch={globalSearch}
-            />
+            selectedStudent ? (
+              <StudentProfileDetailsView
+                student={selectedStudent}
+                onBack={() => setSelectedStudent(null)}
+                onStudentUpdated={(updated) => {
+                  setSelectedStudent(updated);
+                  setRefreshKey((p) => p + 1);
+                }}
+              />
+            ) : (
+              <StudentDirectory
+                refreshKey={refreshKey}
+                onRegisterClick={() => setActiveSection('registrations')}
+                externalSearch={globalSearch}
+                onViewStudent={(student) => setSelectedStudent(student)}
+              />
+            )
           )}
 
           {/* ==========================================================================
@@ -396,7 +413,10 @@ function App() {
                     <button
                       type="button"
                       className="btn-text-link view-in-dir-btn mt-2"
-                      onClick={() => setActiveSection('students')}
+                      onClick={() => {
+                        setSelectedStudent(lastRegistered);
+                        setActiveSection('students');
+                      }}
                     >
                       View in Directory →
                     </button>

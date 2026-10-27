@@ -33,6 +33,7 @@ interface Props {
   refreshKey: number;
   onRegisterClick: () => void;
   externalSearch?: string;
+  onViewStudent?: (student: Student) => void;
 }
 
 const ADMIN_PASSCODE = 'admin123';
@@ -50,6 +51,7 @@ export const StudentDirectory: React.FC<Props> = ({
   refreshKey,
   onRegisterClick,
   externalSearch = '',
+  onViewStudent,
 }) => {
   const [students, setStudents] = useState<Student[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -605,10 +607,16 @@ export const StudentDirectory: React.FC<Props> = ({
                       <div className="row-actions-group">
                         <button
                           type="button"
-                          onClick={() => setSlipStudent(student)}
+                          onClick={() => {
+                            if (onViewStudent) {
+                              onViewStudent(student);
+                            } else {
+                              setSlipStudent(student);
+                            }
+                          }}
                           className="action-icon-pill action-view-pill"
-                          title="View Official Registration Slip"
-                          aria-label={`View slip for ${student.full_name}`}
+                          title="View Student Record"
+                          aria-label={`View record for ${student.full_name}`}
                         >
                           <Eye className="w-3.5 h-3.5" />
                         </button>
