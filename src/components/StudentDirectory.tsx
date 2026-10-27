@@ -18,6 +18,10 @@ import {
   Trash2,
   Printer,
   ShieldCheck,
+  ChevronLeft,
+  ChevronRight,
+  BookOpen,
+  CheckCircle2,
 } from 'lucide-react';
 import type { Student } from '../types/student';
 import { fetchAllStudents, getActiveCredentials } from '../lib/supabaseClient';
@@ -28,20 +32,33 @@ import { DeleteConfirmationModal } from './DeleteConfirmationModal';
 interface Props {
   refreshKey: number;
   onRegisterClick: () => void;
+  externalSearch?: string;
 }
 
 const ADMIN_PASSCODE = 'admin123';
 const SESSION_UNLOCK_KEY = 'student_directory_admin_unlocked';
+const PAGE_SIZE = 8;
 
 export const StudentDirectory: React.FC<Props> = ({
   refreshKey,
   onRegisterClick,
+  externalSearch = '',
 }) => {
   const [students, setStudents] = useState<Student[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [searchQuery, setSearchQuery] = useState<string>(externalSearch);
   const [selectedCourse, setSelectedCourse] = useState<string>('ALL');
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  // Sync external search from header if provided
+  useEffect(() => {
+    if (externalSearch !== undefined && externalSearch !== searchQuery) {
+      setSearchQuery(externalSearch);
+      setCurrentPage(1);
+    }
+  }, [externalSearch]);
 
   // Admin Lock State
   const [isUnlocked, setIsUnlocked] = useState<boolean>(() => {
@@ -109,12 +126,13 @@ export const StudentDirectory: React.FC<Props> = ({
   // Derived filtered students
   const filteredStudents = useMemo(() => {
     return students.filter((s) => {
+      const query = searchQuery.trim().toLowerCase();
       const matchesSearch =
-        searchQuery === '' ||
-        s.full_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        s.student_id.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        s.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        (s.phone && s.phone.includes(searchQuery));
+        query === '' ||
+        s.full_name.toLowerCase().includes(query) ||
+        s.student_id.toLowerCase().includes(query) ||
+        s.email.toLowerCase().includes(query) ||
+        (s.phone && s.phone.includes(query));
 
       const matchesCourse =
         selectedCourse === 'ALL' || s.course.toLowerCase() === selectedCourse.toLowerCase();
@@ -126,9 +144,26 @@ export const StudentDirectory: React.FC<Props> = ({
   // Unique courses for filter
   const uniqueCourses = useMemo(() => {
     const set = new Set<string>();
-    students.forEach((s) => set.add(s.course));
+    students.forEach((s) => {
+      if (s.course) set.add(s.course);
+    });
     return Array.from(set).sort();
   }, [students]);
+
+  // Reset page when filter changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, selectedCourse]);
+
+  // Pagination calculation
+  const totalPages = Math.max(1, Math.ceil(filteredStudents.length / PAGE_SIZE));
+  const paginatedStudents = useMemo(() => {
+    const start = (currentPage - 1) * PAGE_SIZE;
+    return filteredStudents.slice(start, start + PAGE_SIZE);
+  }, [filteredStudents, currentPage]);
+
+  const startIdx = filteredStudents.length === 0 ? 0 : (currentPage - 1) * PAGE_SIZE + 1;
+  const endIdx = Math.min(currentPage * PAGE_SIZE, filteredStudents.length);
 
   // Passcode verification
   const handleUnlock = (e: React.FormEvent) => {
@@ -150,15 +185,23 @@ export const StudentDirectory: React.FC<Props> = ({
     setPasscodeError(false);
   };
 
+  // Toast feedback helper
+  const triggerToast = (msg: string) => {
+    setToastMessage(msg);
+    setTimeout(() => setToastMessage(null), 3500);
+  };
+
   // Student update / delete callbacks
   const handleStudentUpdated = (updated: Student) => {
     setStudents((prev) =>
       prev.map((s) => (s.id === updated.id ? { ...s, ...updated } : s))
     );
+    triggerToast(`Record for ${updated.full_name} successfully updated.`);
   };
 
   const handleStudentDeleted = (deletedId: string) => {
     setStudents((prev) => prev.filter((s) => s.id !== deletedId));
+    triggerToast('Student record permanently deleted.');
   };
 
   // Export to CSV
@@ -183,7 +226,7 @@ export const StudentDirectory: React.FC<Props> = ({
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement('a');
     link.setAttribute('href', encodedUri);
-    link.setAttribute('download', `students_directory_${new Date().toISOString().slice(0, 10)}.csv`);
+    link.setAttribute('download', `eduregister_students_${new Date().toISOString().slice(0, 10)}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -195,7 +238,7 @@ export const StudentDirectory: React.FC<Props> = ({
       <div className="directory-lock-wrapper">
         <div className="lock-card">
           <div className="lock-icon-container">
-            <Lock className="w-10 h-10 text-indigo-400" />
+            <Lock className="w-9 h-9 text-indigo-400" />
           </div>
           <h2 className="lock-title">Registrar Protected Directory</h2>
           <p className="lock-subtitle">
@@ -217,6 +260,7 @@ export const StudentDirectory: React.FC<Props> = ({
                 className="form-input"
                 id="input-admin-passcode"
                 autoFocus
+                aria-label="Admin passcode"
               />
             </div>
 
@@ -243,13 +287,20 @@ export const StudentDirectory: React.FC<Props> = ({
 
   return (
     <div className="directory-container">
-      {/* Header & Stats bar */}
+      {/* Toast Feedback */}
+      {toastMessage && (
+        <div className="feedback-toast" role="status" aria-live="polite">
+          <CheckCircle2 className="w-4 h-4 text-emerald-400 mr-2 flex-shrink-0" />
+          <span>{toastMessage}</span>
+        </div>
+      )}
+
+      {/* Screen 1 Header */}
       <div className="directory-header">
-        <div>
-          <h2 className="section-title">
-            <Users className="w-6 h-6 text-indigo-400 inline-block mr-2" />
+        <div className="directory-title-block">
+          <h1 className="section-title">
             Registered Students Directory
-          </h2>
+          </h1>
           <p className="section-subtitle">
             Browse, search, edit, and print official records for registered students.
           </p>
@@ -262,7 +313,8 @@ export const StudentDirectory: React.FC<Props> = ({
             onClick={loadStudents}
             disabled={loading || !isConfigured}
             className="btn-secondary"
-            title="Refresh student list"
+            title="Refresh student records"
+            aria-label="Refresh student list"
           >
             <RefreshCw className={`w-4 h-4 mr-1.5 ${loading ? 'animate-spin' : ''}`} />
             Refresh
@@ -274,7 +326,8 @@ export const StudentDirectory: React.FC<Props> = ({
             onClick={handleExportCSV}
             disabled={filteredStudents.length === 0}
             className="btn-secondary"
-            title="Download CSV"
+            title="Download CSV of current list"
+            aria-label="Export students to CSV"
           >
             <Download className="w-4 h-4 mr-1.5" />
             Export CSV
@@ -285,6 +338,8 @@ export const StudentDirectory: React.FC<Props> = ({
             id="btn-new-student-from-dir"
             onClick={onRegisterClick}
             className="btn-primary"
+            title="Register a new student"
+            aria-label="New student registration"
           >
             <Sparkles className="w-4 h-4 mr-1.5" />
             New Student
@@ -294,39 +349,55 @@ export const StudentDirectory: React.FC<Props> = ({
             type="button"
             onClick={handleLock}
             className="btn-secondary lock-btn"
-            title="Lock Directory"
+            title="Lock Directory for privacy"
+            aria-label="Lock student directory"
           >
-            <Lock className="w-4 h-4 mr-1" />
-            <span className="hidden-sm">Lock</span>
+            <Lock className="w-4 h-4 mr-1.5 text-slate-400" />
+            <span>Lock</span>
           </button>
         </div>
       </div>
 
-      {/* Metrics Cards */}
+      {/* Directory Statistics (3 Professional Cards) */}
       <div className="metrics-grid">
         <div className="metric-card">
-          <span className="metric-label">Total Registered</span>
+          <div className="metric-header-row">
+            <span className="metric-label">Total Registered</span>
+            <div className="metric-icon-wrap" aria-hidden="true">
+              <Users className="w-4 h-4 text-indigo-400" />
+            </div>
+          </div>
           <span className="metric-value">{students.length}</span>
           <span className="metric-sub">Active Records</span>
         </div>
 
         <div className="metric-card">
-          <span className="metric-label">Active Programs</span>
+          <div className="metric-header-row">
+            <span className="metric-label">Active Programs</span>
+            <div className="metric-icon-wrap" aria-hidden="true">
+              <BookOpen className="w-4 h-4 text-blue-400" />
+            </div>
+          </div>
           <span className="metric-value">{uniqueCourses.length}</span>
           <span className="metric-sub">Unique study fields</span>
         </div>
 
         <div className="metric-card">
-          <span className="metric-label">Filtered Results</span>
+          <div className="metric-header-row">
+            <span className="metric-label">Filtered Results</span>
+            <div className="metric-icon-wrap" aria-hidden="true">
+              <Filter className="w-4 h-4 text-emerald-400" />
+            </div>
+          </div>
           <span className="metric-value">{filteredStudents.length}</span>
           <span className="metric-sub">Matching search criteria</span>
         </div>
       </div>
 
-      {/* Filter and Search Bar */}
+      {/* Search and Filter Section */}
       <div className="search-filter-bar">
         <div className="search-input-wrapper">
-          <Search className="search-icon" />
+          <Search className="search-icon" aria-hidden="true" />
           <input
             type="text"
             id="search-students"
@@ -334,12 +405,15 @@ export const StudentDirectory: React.FC<Props> = ({
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="search-input"
+            aria-label="Search student records"
           />
           {searchQuery && (
             <button
               type="button"
               className="clear-search-btn"
               onClick={() => setSearchQuery('')}
+              title="Clear search"
+              aria-label="Clear search query"
             >
               ×
             </button>
@@ -347,12 +421,13 @@ export const StudentDirectory: React.FC<Props> = ({
         </div>
 
         <div className="filter-select-wrapper">
-          <Filter className="filter-icon" />
+          <Filter className="filter-icon" aria-hidden="true" />
           <select
             id="filter-course"
             value={selectedCourse}
             onChange={(e) => setSelectedCourse(e.target.value)}
             className="filter-select"
+            aria-label="Filter students by course"
           >
             <option value="ALL">All Courses ({students.length})</option>
             {uniqueCourses.map((c) => (
@@ -366,7 +441,7 @@ export const StudentDirectory: React.FC<Props> = ({
 
       {/* Fetch Error Banner */}
       {error && (
-        <div className="error-alert">
+        <div className="error-alert" role="alert">
           <div>
             <strong>Failed to fetch student records:</strong> {error}
           </div>
@@ -380,11 +455,11 @@ export const StudentDirectory: React.FC<Props> = ({
         </div>
       )}
 
-      {/* Students Table or Empty State */}
+      {/* Student Table */}
       <div className="table-responsive-wrapper">
         {loading ? (
           <div className="table-loading-state">
-            <RefreshCw className="w-8 h-8 animate-spin text-indigo-400" />
+            <RefreshCw className="w-8 h-8 animate-spin text-indigo-400 mb-2" />
             <p>Loading registered student records...</p>
           </div>
         ) : filteredStudents.length === 0 ? (
@@ -434,69 +509,89 @@ export const StudentDirectory: React.FC<Props> = ({
               </tr>
             </thead>
             <tbody>
-              {filteredStudents.map((student) => (
+              {paginatedStudents.map((student) => (
                 <tr key={student.id} className="student-row">
+                  {/* Student identity cell */}
                   <td>
                     <div className="student-cell-identity">
-                      <div className="student-avatar">
+                      <div className="student-avatar" aria-hidden="true">
                         {student.full_name.charAt(0).toUpperCase()}
                       </div>
-                      <div>
-                        <div className="student-name">{student.full_name}</div>
+                      <div className="student-names-col">
+                        <div className="student-name font-semibold">{student.full_name}</div>
                         <div className="student-uuid" title={student.id}>
                           Ref: {student.id.slice(0, 8)}...
                         </div>
                       </div>
                     </div>
                   </td>
+
+                  {/* Student ID pill */}
                   <td>
-                    <span className="student-id-badge">
+                    <span className="student-id-badge font-mono">
                       <IdCard className="w-3.5 h-3.5 mr-1 text-indigo-400" />
                       {student.student_id}
                     </span>
                   </td>
+
+                  {/* Contact cell */}
                   <td>
                     <div className="contact-cell-stack">
                       <span className="student-email-link">
-                        <Mail className="w-3.5 h-3.5 mr-1 text-slate-400" />
-                        <a href={`mailto:${student.email}`}>{student.email}</a>
+                        <Mail className="w-3.5 h-3.5 mr-1 text-slate-400 flex-shrink-0" />
+                        <a href={`mailto:${student.email}`} title={`Email ${student.email}`}>
+                          {student.email}
+                        </a>
                       </span>
-                      {student.phone && (
+                      {student.phone ? (
                         <span className="student-phone-cell">
-                          <Phone className="w-3 h-3 mr-1 text-slate-500" />
-                          {student.phone}
+                          <Phone className="w-3 h-3 mr-1 text-slate-500 flex-shrink-0" />
+                          <span>{student.phone}</span>
+                        </span>
+                      ) : (
+                        <span className="student-phone-cell text-muted">
+                          <Phone className="w-3 h-3 mr-1 text-slate-600 flex-shrink-0" />
+                          <span>No phone recorded</span>
                         </span>
                       )}
                     </div>
                   </td>
+
+                  {/* Course / Term cell */}
                   <td>
                     <div className="course-term-stack">
                       <span className="course-badge">
-                        <GraduationCap className="w-3.5 h-3.5 mr-1" />
-                        {student.course}
+                        <GraduationCap className="w-3.5 h-3.5 mr-1 text-indigo-300" />
+                        <span>{student.course}</span>
                       </span>
                       <span className="term-sub-badge">
                         {student.academic_term || 'Fall 2026'}
                       </span>
                     </div>
                   </td>
+
+                  {/* Registered Date cell */}
                   <td>
                     <span className="date-cell">
                       <Calendar className="w-3.5 h-3.5 mr-1 text-slate-400" />
-                      {new Date(student.created_at).toLocaleDateString(undefined, {
-                        month: 'short',
-                        day: 'numeric',
-                        year: 'numeric',
-                      })}
+                      <span>
+                        {new Date(student.created_at).toLocaleDateString(undefined, {
+                          month: 'short',
+                          day: 'numeric',
+                          year: 'numeric',
+                        })}
+                      </span>
                     </span>
                   </td>
+
+                  {/* Actions cell */}
                   <td>
                     <div className="row-actions-group">
                       <button
                         type="button"
                         onClick={() => setSlipStudent(student)}
                         className="action-icon-btn slip-btn"
-                        title="View / Print Admission Slip with QR Code"
+                        title="View & Print Official Registration Slip"
                         aria-label={`Print slip for ${student.full_name}`}
                       >
                         <Printer className="w-4 h-4" />
@@ -530,8 +625,52 @@ export const StudentDirectory: React.FC<Props> = ({
         )}
       </div>
 
-      <div className="directory-footer">
-        <span>Showing {filteredStudents.length} of {students.length} students</span>
+      {/* Pagination Footer */}
+      <div className="directory-footer-pagination">
+        <div className="pagination-info">
+          Showing <span className="font-medium text-slate-200">{startIdx}</span>–
+          <span className="font-medium text-slate-200">{endIdx}</span> of{' '}
+          <span className="font-medium text-slate-200">{filteredStudents.length}</span> students
+        </div>
+
+        <div className="pagination-controls">
+          <button
+            type="button"
+            className="pagination-btn"
+            disabled={currentPage <= 1}
+            onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+            aria-label="Previous page"
+          >
+            <ChevronLeft className="w-4 h-4 mr-1" />
+            Previous
+          </button>
+
+          <div className="pagination-pages">
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+              <button
+                key={page}
+                type="button"
+                className={`page-num-btn ${page === currentPage ? 'active' : ''}`}
+                onClick={() => setCurrentPage(page)}
+                aria-label={`Page ${page}`}
+                aria-current={page === currentPage ? 'page' : undefined}
+              >
+                {page}
+              </button>
+            ))}
+          </div>
+
+          <button
+            type="button"
+            className="pagination-btn"
+            disabled={currentPage >= totalPages}
+            onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+            aria-label="Next page"
+          >
+            Next
+            <ChevronRight className="w-4 h-4 ml-1" />
+          </button>
+        </div>
       </div>
 
       {/* Modals */}

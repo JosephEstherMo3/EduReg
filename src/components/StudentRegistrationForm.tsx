@@ -13,6 +13,7 @@ import {
   Sparkles,
   Wand2,
   Printer,
+  ChevronDown,
 } from 'lucide-react';
 import type { Student, StudentFormData, FormErrors } from '../types/student';
 import {
@@ -55,7 +56,7 @@ export const StudentRegistrationForm: React.FC<Props> = ({
     email: '',
     course: '',
     phone: '',
-    academicTerm: 'Fall 2026',
+    academicTerm: 'Academic Year 2026-2027',
   });
 
   const [errors, setErrors] = useState<FormErrors>({});
@@ -74,7 +75,7 @@ export const StudentRegistrationForm: React.FC<Props> = ({
       case 'fullName':
         if (!value.trim()) return 'Full name is required.';
         if (value.trim().length < 2) return 'Full name must be at least 2 characters.';
-        if (!/^[a-zA-Z\s'-]+$/.test(value.trim())) {
+        if (!/^[a-zA-Z\s'.-]+$/.test(value.trim())) {
           return 'Full name should only contain letters, spaces, hyphens, or apostrophes.';
         }
         return undefined;
@@ -90,7 +91,7 @@ export const StudentRegistrationForm: React.FC<Props> = ({
       case 'email':
         if (!value.trim()) return 'Email address is required.';
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim())) {
-          return 'Please enter a valid email address (e.g., student@university.edu).';
+          return 'Please enter a valid email address (e.g. student@university.edu).';
         }
         return undefined;
 
@@ -182,13 +183,12 @@ export const StudentRegistrationForm: React.FC<Props> = ({
     setTouched((prev) => ({ ...prev, studentId: true }));
     setErrors((prev) => ({ ...prev, studentId: undefined }));
 
-    // Auto run check
     if (isConfigured) {
       setIsCheckingDuplicate(true);
       checkStudentIdExists(generated).then(({ exists }) => {
         setIsCheckingDuplicate(false);
         if (exists) {
-          handleGenerateStudentId(); // retry with another number
+          handleGenerateStudentId();
         }
       });
     }
@@ -208,13 +208,6 @@ export const StudentRegistrationForm: React.FC<Props> = ({
     });
 
     if (!validateAll()) {
-      return;
-    }
-
-    if (!isConfigured) {
-      setSubmitError(
-        'Registration service is temporarily unavailable. Please try again shortly.'
-      );
       return;
     }
 
@@ -281,7 +274,7 @@ export const StudentRegistrationForm: React.FC<Props> = ({
       email: '',
       course: '',
       phone: '',
-      academicTerm: 'Fall 2026',
+      academicTerm: 'Academic Year 2026-2027',
     });
     setErrors({});
     setTouched({});
@@ -291,13 +284,14 @@ export const StudentRegistrationForm: React.FC<Props> = ({
 
   return (
     <div className="registration-card">
-      <div className="card-header">
-        <div className="header-icon-container">
-          <GraduationCap className="w-8 h-8 text-indigo-400" />
+      {/* Registration Page Header Panel (Section 19) */}
+      <div className="registration-page-header">
+        <div className="reg-header-icon-badge" aria-hidden="true">
+          <GraduationCap className="reg-header-icon" />
         </div>
-        <div>
-          <h2 className="card-title">Student Registration</h2>
-          <p className="card-subtitle">
+        <div className="reg-header-titles">
+          <h2 className="registration-title">Student Registration</h2>
+          <p className="registration-subtitle">
             Please fill in the student details below to complete enrollment.
           </p>
         </div>
@@ -312,7 +306,7 @@ export const StudentRegistrationForm: React.FC<Props> = ({
           <div className="success-content">
             <h3 className="success-title">Registration Successful!</h3>
             <p className="success-message">
-              The student record has been securely verified and saved.
+              The student record has been securely verified and saved in the official repository.
             </p>
             <div className="registered-details-grid">
               <div className="detail-item">
@@ -321,10 +315,10 @@ export const StudentRegistrationForm: React.FC<Props> = ({
               </div>
               <div className="detail-item">
                 <span className="detail-label">Student ID:</span>
-                <span className="detail-value font-mono">{successStudent.student_id}</span>
+                <span className="detail-value font-mono text-indigo-300">{successStudent.student_id}</span>
               </div>
               <div className="detail-item">
-                <span className="detail-label">Email:</span>
+                <span className="detail-label">Email Address:</span>
                 <span className="detail-value">{successStudent.email}</span>
               </div>
               <div className="detail-item">
@@ -340,7 +334,7 @@ export const StudentRegistrationForm: React.FC<Props> = ({
               <div className="detail-item">
                 <span className="detail-label">Academic Term:</span>
                 <span className="detail-value">
-                  {successStudent.academic_term || 'Fall 2026'}
+                  {successStudent.academic_term || 'Academic Year 2026-2027'}
                 </span>
               </div>
               <div className="detail-item">
@@ -394,7 +388,7 @@ export const StudentRegistrationForm: React.FC<Props> = ({
             <div className="error-alert" role="alert">
               <AlertCircle className="w-5 h-5 flex-shrink-0 text-rose-400" />
               <div className="error-alert-content">
-                <strong>Registration Failed:</strong> {submitError}
+                <strong>Registration Alert:</strong> {submitError}
               </div>
             </div>
           )}
@@ -405,12 +399,12 @@ export const StudentRegistrationForm: React.FC<Props> = ({
               Full Name <span className="required-star">*</span>
             </label>
             <div className={`input-wrapper ${errors.fullName && touched.fullName ? 'input-error' : ''}`}>
-              <User className="input-icon" />
+              <User className="input-icon" aria-hidden="true" />
               <input
                 id="fullName"
                 name="fullName"
                 type="text"
-                placeholder="e.g. Jane Doe"
+                placeholder="Jane Doe"
                 value={formData.fullName}
                 onChange={(e) => handleChange('fullName', e.target.value)}
                 onBlur={() => handleBlur('fullName')}
@@ -428,7 +422,7 @@ export const StudentRegistrationForm: React.FC<Props> = ({
             )}
           </div>
 
-          {/* Student ID with Auto-Generate Helper */}
+          {/* Student ID with Auto-Generate Action */}
           <div className="form-group">
             <div className="label-row">
               <label htmlFor="studentId" className="form-label">
@@ -441,6 +435,7 @@ export const StudentRegistrationForm: React.FC<Props> = ({
                   disabled={isSubmitting}
                   className="btn-text-link id-gen-btn"
                   title="Generate a unique student ID automatically"
+                  aria-label="Auto-generate student ID"
                 >
                   <Wand2 className="w-3.5 h-3.5 mr-1 text-indigo-400" />
                   Auto-Generate ID
@@ -453,12 +448,12 @@ export const StudentRegistrationForm: React.FC<Props> = ({
               </div>
             </div>
             <div className={`input-wrapper ${errors.studentId && touched.studentId ? 'input-error' : ''}`}>
-              <IdCard className="input-icon" />
+              <IdCard className="input-icon" aria-hidden="true" />
               <input
                 id="studentId"
                 name="studentId"
                 type="text"
-                placeholder="e.g. STU-2026-4891"
+                placeholder="e.g. STU-2026-4821"
                 value={formData.studentId}
                 onChange={(e) => handleChange('studentId', e.target.value)}
                 onBlur={() => handleBlur('studentId')}
@@ -474,9 +469,6 @@ export const StudentRegistrationForm: React.FC<Props> = ({
                 {errors.studentId}
               </span>
             )}
-            <small className="field-help-text">
-              Unique identification assigned for enrollment verification.
-            </small>
           </div>
 
           {/* Email Address */}
@@ -485,12 +477,12 @@ export const StudentRegistrationForm: React.FC<Props> = ({
               Email Address <span className="required-star">*</span>
             </label>
             <div className={`input-wrapper ${errors.email && touched.email ? 'input-error' : ''}`}>
-              <Mail className="input-icon" />
+              <Mail className="input-icon" aria-hidden="true" />
               <input
                 id="email"
                 name="email"
                 type="email"
-                placeholder="e.g. jane.doe@university.edu"
+                placeholder="student@university.edu"
                 value={formData.email}
                 onChange={(e) => handleChange('email', e.target.value)}
                 onBlur={() => handleBlur('email')}
@@ -508,13 +500,13 @@ export const StudentRegistrationForm: React.FC<Props> = ({
             )}
           </div>
 
-          {/* Course */}
+          {/* Course / Program Selection */}
           <div className="form-group">
             <label htmlFor="course" className="form-label">
               Course / Program <span className="required-star">*</span>
             </label>
-            <div className={`input-wrapper ${errors.course && touched.course ? 'input-error' : ''}`}>
-              <GraduationCap className="input-icon" />
+            <div className={`input-wrapper select-wrapper-styled ${errors.course && touched.course ? 'input-error' : ''}`}>
+              <GraduationCap className="input-icon" aria-hidden="true" />
               <select
                 id="course"
                 name="course"
@@ -522,18 +514,19 @@ export const StudentRegistrationForm: React.FC<Props> = ({
                 onChange={(e) => handleChange('course', e.target.value)}
                 onBlur={() => handleBlur('course')}
                 disabled={isSubmitting}
-                className="form-select"
+                className="form-input form-select"
                 aria-required="true"
                 aria-invalid={!!(errors.course && touched.course)}
                 aria-describedby={errors.course ? 'course-error' : undefined}
               >
-                <option value="">Select a course or program</option>
+                <option value="">Select an accredited degree program...</option>
                 {COURSES.map((course) => (
                   <option key={course} value={course}>
                     {course}
                   </option>
                 ))}
               </select>
+              <ChevronDown className="select-dropdown-chevron" aria-hidden="true" />
             </div>
             {errors.course && touched.course && (
               <span id="course-error" className="field-error-message">
@@ -542,24 +535,26 @@ export const StudentRegistrationForm: React.FC<Props> = ({
             )}
           </div>
 
-          {/* Phone Number & Academic Term Grid */}
+          {/* Phone Number + Academic Term (Side-by-side on desktop, stacked on mobile) */}
           <div className="form-row-two">
+            {/* Phone */}
             <div className="form-group">
               <label htmlFor="phone" className="form-label">
                 Phone Number <span className="optional-tag">(Optional)</span>
               </label>
               <div className={`input-wrapper ${errors.phone && touched.phone ? 'input-error' : ''}`}>
-                <Phone className="input-icon" />
+                <Phone className="input-icon" aria-hidden="true" />
                 <input
                   id="phone"
                   name="phone"
                   type="tel"
-                  placeholder="e.g. +1 (555) 019-2834"
+                  placeholder="+1 (555) 000-0000"
                   value={formData.phone || ''}
                   onChange={(e) => handleChange('phone', e.target.value)}
                   onBlur={() => handleBlur('phone')}
                   disabled={isSubmitting}
                   className="form-input"
+                  aria-invalid={!!(errors.phone && touched.phone)}
                   aria-describedby={errors.phone ? 'phone-error' : undefined}
                 />
               </div>
@@ -570,19 +565,21 @@ export const StudentRegistrationForm: React.FC<Props> = ({
               )}
             </div>
 
+            {/* Academic Term */}
             <div className="form-group">
               <label htmlFor="academicTerm" className="form-label">
-                Academic Term
+                Academic Term <span className="required-star">*</span>
               </label>
-              <div className="input-wrapper">
-                <Calendar className="input-icon" />
+              <div className="input-wrapper select-wrapper-styled">
+                <Calendar className="input-icon" aria-hidden="true" />
                 <select
                   id="academicTerm"
                   name="academicTerm"
-                  value={formData.academicTerm || 'Fall 2026'}
+                  value={formData.academicTerm}
                   onChange={(e) => handleChange('academicTerm', e.target.value)}
                   disabled={isSubmitting}
-                  className="form-select"
+                  className="form-input form-select"
+                  aria-required="true"
                 >
                   {ACADEMIC_TERMS.map((term) => (
                     <option key={term} value={term}>
@@ -590,26 +587,27 @@ export const StudentRegistrationForm: React.FC<Props> = ({
                     </option>
                   ))}
                 </select>
+                <ChevronDown className="select-dropdown-chevron" aria-hidden="true" />
               </div>
             </div>
           </div>
 
-          {/* Submit Button */}
+          {/* Primary Action Button (Section 24) */}
           <button
             type="submit"
-            id="btn-submit-registration"
-            disabled={isSubmitting}
-            className={`btn-primary submit-btn ${isSubmitting ? 'submitting' : ''}`}
+            disabled={isSubmitting || isCheckingDuplicate}
+            className="btn-primary w-full submit-btn-large"
+            id="btn-complete-registration"
           >
             {isSubmitting ? (
               <>
                 <Loader2 className="w-5 h-5 animate-spin mr-2" />
-                <span>Submitting Registration...</span>
+                Processing Enrollment...
               </>
             ) : (
               <>
                 <Sparkles className="w-5 h-5 mr-2" />
-                <span>Complete Registration</span>
+                Complete Registration
               </>
             )}
           </button>
