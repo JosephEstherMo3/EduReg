@@ -9,17 +9,17 @@ import {
   Search,
   Bell,
   ChevronDown,
-  LayoutDashboard,
+  Home,
   BookOpen,
   FileText,
   Settings,
   Menu,
   X,
-  Sparkles,
-  Download,
+  Plus,
   Calendar,
   Clock,
   ExternalLink,
+  ChevronRight,
 } from 'lucide-react';
 import { StudentRegistrationForm } from './components/StudentRegistrationForm';
 import { StudentDirectory } from './components/StudentDirectory';
@@ -35,10 +35,10 @@ function App() {
     id: 'sample-latest-id',
     full_name: 'Charlotte Esthy',
     student_id: 'STU-2026-4356',
-    email: 'charlotte.esthy@university.edu',
-    phone: '+1 (555) 234-8901',
+    email: 'charlotteesthy49@gmail.com',
+    phone: '+2348162600530',
     course: 'Information Technology',
-    academic_term: 'Academic Year 2026-2027',
+    academic_term: 'Academic Year 2026 - 2027',
     created_at: new Date('2026-10-27T09:30:00Z').toISOString(),
   });
   const [globalSearch, setGlobalSearch] = useState<string>('');
@@ -63,7 +63,7 @@ function App() {
   return (
     <div className="app-shell-enterprise">
       {/* ==============================================================================
-          Top Application Header (Section 3)
+          Top Application Header (Matching Screenshot)
           ============================================================================== */}
       <header className="enterprise-top-header">
         <div className="header-left-zone">
@@ -85,11 +85,11 @@ function App() {
             tabIndex={0}
           >
             <div className="brand-seal-icon">
-              <GraduationCap className="w-5 h-5 text-indigo-400" />
+              <GraduationCap className="w-5 h-5 text-white" />
             </div>
             <div className="brand-text-block">
               <span className="brand-title-main">EduRegister</span>
-              <span className="brand-subtitle-badge">Portal</span>
+              <span className="brand-subtitle-badge">STUDENT PORTAL</span>
             </div>
           </div>
         </div>
@@ -126,7 +126,7 @@ function App() {
 
         {/* Admin & Notifications Right Area */}
         <div className="header-right-zone">
-          {/* Notification Button */}
+          {/* Notification Button with Red Badge */}
           <div className="notification-btn-wrapper">
             <button
               type="button"
@@ -136,18 +136,18 @@ function App() {
               title="Notifications"
             >
               <Bell className="w-4 h-4 text-slate-300" />
-              <span className="notification-dot" />
+              <span className="notification-badge-red">1</span>
             </button>
 
             {showNotificationPopup && (
               <div className="notification-dropdown-card">
                 <div className="notification-header">
-                  <span className="font-semibold text-sm">System Notifications</span>
+                  <span className="font-semibold text-xs">System Notifications</span>
                   <span className="text-xs text-indigo-400 font-mono">Session 2026</span>
                 </div>
                 <div className="notification-list">
                   <div className="notification-item unread">
-                    <CheckCircle className="w-4 h-4 text-emerald-400 flex-shrink-0 mt-0.5" />
+                    <CheckCircle className="w-3.5 h-3.5 text-emerald-400 flex-shrink-0 mt-0.5" />
                     <div>
                       <p className="text-xs font-medium text-slate-200">
                         Enrollment database online
@@ -156,7 +156,7 @@ function App() {
                     </div>
                   </div>
                   <div className="notification-item">
-                    <ShieldCheck className="w-4 h-4 text-indigo-400 flex-shrink-0 mt-0.5" />
+                    <ShieldCheck className="w-3.5 h-3.5 text-indigo-400 flex-shrink-0 mt-0.5" />
                     <div>
                       <p className="text-xs font-medium text-slate-200">
                         Directory protection active
@@ -169,9 +169,7 @@ function App() {
             )}
           </div>
 
-          <div className="header-divider-vertical" />
-
-          {/* Admin Profile Display (Joseph Esther • Admin) */}
+          {/* Admin Profile Display (Purple Circle JE • Joseph Esther • Admin • Chevron) */}
           <div className="admin-profile-pill" title="Administrator Profile">
             <div className="admin-avatar-circle" aria-hidden="true">
               <span>JE</span>
@@ -180,13 +178,13 @@ function App() {
               <span className="admin-user-name">Joseph Esther</span>
               <span className="admin-user-role">Admin</span>
             </div>
-            <ChevronDown className="w-3.5 h-3.5 text-slate-400 ml-1" />
+            <ChevronDown className="w-3.5 h-3.5 text-slate-400 ml-0.5" />
           </div>
         </div>
       </header>
 
       {/* ==============================================================================
-          Main Enterprise Body (Sidebar + Content Canvas)
+          Main Enterprise Body (Sidebar + Content Viewport)
           ============================================================================== */}
       <div className="enterprise-body-layout">
         {/* Backdrop for mobile sidebar drawer */}
@@ -198,11 +196,9 @@ function App() {
           />
         )}
 
-        {/* Left Sidebar Navigation (Section 3) */}
+        {/* Left Sidebar Navigation (Matching Screenshot) */}
         <aside className={`enterprise-left-sidebar ${isMobileMenuOpen ? 'open' : ''}`}>
           <div className="sidebar-inner-nav">
-            <div className="sidebar-nav-section-label">MANAGEMENT PORTAL</div>
-
             <nav className="sidebar-nav-list" aria-label="Portal Navigation">
               {/* 1. Dashboard */}
               <button
@@ -210,8 +206,9 @@ function App() {
                 className={`sidebar-nav-item ${activeSection === 'dashboard' ? 'active' : ''}`}
                 onClick={() => navigateTo('dashboard')}
               >
-                <LayoutDashboard className="sidebar-nav-icon" />
+                <Home className="sidebar-nav-icon" />
                 <span className="sidebar-nav-text">Dashboard</span>
+                {activeSection === 'dashboard' && <ChevronRight className="active-arrow" />}
               </button>
 
               {/* 2. Students Directory */}
@@ -222,6 +219,7 @@ function App() {
               >
                 <Users className="sidebar-nav-icon" />
                 <span className="sidebar-nav-text">Students</span>
+                {activeSection === 'students' && <ChevronRight className="active-arrow" />}
               </button>
 
               {/* 3. Courses */}
@@ -232,6 +230,7 @@ function App() {
               >
                 <BookOpen className="sidebar-nav-icon" />
                 <span className="sidebar-nav-text">Courses</span>
+                {activeSection === 'courses' && <ChevronRight className="active-arrow" />}
               </button>
 
               {/* 4. Registrations */}
@@ -242,6 +241,7 @@ function App() {
               >
                 <Zap className="sidebar-nav-icon" />
                 <span className="sidebar-nav-text">Registrations</span>
+                {activeSection === 'registrations' && <ChevronRight className="active-arrow" />}
               </button>
 
               {/* 5. Reports */}
@@ -252,6 +252,7 @@ function App() {
               >
                 <FileText className="sidebar-nav-icon" />
                 <span className="sidebar-nav-text">Reports</span>
+                {activeSection === 'reports' && <ChevronRight className="active-arrow" />}
               </button>
 
               {/* 6. Settings */}
@@ -262,16 +263,22 @@ function App() {
               >
                 <Settings className="sidebar-nav-icon" />
                 <span className="sidebar-nav-text">Settings</span>
+                {activeSection === 'settings' && <ChevronRight className="active-arrow" />}
               </button>
             </nav>
 
-            {/* Sidebar Bottom Institution Badge */}
+            {/* Sidebar Bottom Institution Badge (Matching Screenshot) */}
             <div className="sidebar-bottom-badge">
               <div className="institution-info-row">
-                <GraduationCap className="w-4 h-4 text-indigo-400" />
-                <span className="institution-name">EduRegister</span>
+                <div className="institution-seal-mini">
+                  <GraduationCap className="w-4 h-4 text-indigo-400" />
+                </div>
+                <div>
+                  <div className="institution-name">EduRegister</div>
+                  <div className="institution-term-sub">Academic Session</div>
+                  <div className="institution-term-year">2026 - 2027</div>
+                </div>
               </div>
-              <p className="institution-term-sub">Academic Session 2026–2027</p>
               <div className="system-live-pill">
                 <span className="live-status-indicator" />
                 <span>Registrar Services Active</span>
@@ -304,9 +311,8 @@ function App() {
                 />
               </div>
 
-              {/* Right-Side Registration Panels (Sections 25, 26, 27) */}
+              {/* Right-Side Registration Panels */}
               <div className="sidebar-column">
-                {/* Section 25: Registration Guidelines */}
                 <div className="info-card">
                   <div className="info-card-header">
                     <ShieldCheck className="w-5 h-5 text-indigo-400" />
@@ -352,7 +358,7 @@ function App() {
                   </ul>
                 </div>
 
-                {/* Section 26: Latest Confirmed Registration */}
+                {/* Latest Confirmed Registration */}
                 {lastRegistered && (
                   <div className="last-registered-card">
                     <div className="last-reg-header">
@@ -397,7 +403,7 @@ function App() {
                   </div>
                 )}
 
-                {/* Section 27: Admissions Office */}
+                {/* Admissions Office */}
                 <div className="quick-help-card">
                   <div className="help-card-header">
                     <h4>Admissions Office</h4>
@@ -436,17 +442,17 @@ function App() {
                   <button
                     type="button"
                     onClick={() => navigateTo('registrations')}
-                    className="btn-primary"
+                    className="banner-action-btn banner-btn-solid-purple"
                   >
-                    <Sparkles className="w-4 h-4 mr-2" />
+                    <Plus className="w-4 h-4 mr-1.5" />
                     New Student Registration
                   </button>
                   <button
                     type="button"
                     onClick={() => navigateTo('students')}
-                    className="btn-secondary"
+                    className="banner-action-btn banner-btn-outline"
                   >
-                    <Users className="w-4 h-4 mr-2" />
+                    <Users className="w-4 h-4 mr-1.5" />
                     Open Directory
                   </button>
                 </div>
@@ -544,9 +550,9 @@ function App() {
                 <button
                   type="button"
                   onClick={() => navigateTo('registrations')}
-                  className="btn-primary"
+                  className="banner-action-btn banner-btn-solid-purple"
                 >
-                  <Sparkles className="w-4 h-4 mr-2" />
+                  <Plus className="w-4 h-4 mr-1.5" />
                   Enroll in Program
                 </button>
               </div>
@@ -577,7 +583,7 @@ function App() {
                     </div>
                     <button
                       type="button"
-                      className="btn-text-link mt-3"
+                      className="btn-text-link mt-2"
                       onClick={() => navigateTo('registrations')}
                     >
                       Register student in track →
@@ -603,9 +609,8 @@ function App() {
                 <button
                   type="button"
                   onClick={() => navigateTo('students')}
-                  className="btn-secondary"
+                  className="banner-action-btn banner-btn-outline"
                 >
-                  <Download className="w-4 h-4 mr-2" />
                   Access CSV Exporter in Directory
                 </button>
               </div>
@@ -673,7 +678,7 @@ function App() {
                   <button
                     type="button"
                     onClick={() => navigateTo('students')}
-                    className="btn-secondary"
+                    className="banner-action-btn banner-btn-outline"
                   >
                     Open Directory Passcode Gate
                   </button>
@@ -699,22 +704,6 @@ function App() {
           )}
         </main>
       </div>
-
-      {/* Footer */}
-      <footer className="enterprise-app-footer">
-        <div className="enterprise-footer-content">
-          <p className="footer-copyright">
-            EduRegister Student Portal • Academic Admissions & Student Information System
-          </p>
-          <div className="footer-meta-links">
-            <span>Academic Session 2026–2027</span>
-            <span className="meta-bullet">•</span>
-            <span>Official Student Records</span>
-            <span className="meta-bullet">•</span>
-            <span>Accredited Institutional Administration</span>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 }

@@ -10,18 +10,18 @@ import {
   Phone,
   IdCard,
   GraduationCap,
-  Sparkles,
+  Plus,
   Lock,
   Unlock,
   KeyRound,
   Edit2,
   Trash2,
-  Printer,
+  Eye,
   ShieldCheck,
   ChevronLeft,
   ChevronRight,
-  BookOpen,
   CheckCircle2,
+  ChevronDown,
 } from 'lucide-react';
 import type { Student } from '../types/student';
 import { fetchAllStudents, getActiveCredentials } from '../lib/supabaseClient';
@@ -38,6 +38,13 @@ interface Props {
 const ADMIN_PASSCODE = 'admin123';
 const SESSION_UNLOCK_KEY = 'student_directory_admin_unlocked';
 const PAGE_SIZE = 8;
+
+// Deterministic avatar color palette matching the screenshot (Blue, Teal/Green, Purple)
+const AVATAR_COLORS = [
+  'bg-avatar-blue',
+  'bg-avatar-teal',
+  'bg-avatar-purple',
+];
 
 export const StudentDirectory: React.FC<Props> = ({
   refreshKey,
@@ -238,7 +245,7 @@ export const StudentDirectory: React.FC<Props> = ({
       <div className="directory-lock-wrapper">
         <div className="lock-card">
           <div className="lock-icon-container">
-            <Lock className="w-9 h-9 text-indigo-400" />
+            <Lock className="w-8 h-8 text-indigo-400" />
           </div>
           <h2 className="lock-title">Registrar Protected Directory</h2>
           <p className="lock-subtitle">
@@ -295,28 +302,31 @@ export const StudentDirectory: React.FC<Props> = ({
         </div>
       )}
 
-      {/* Screen 1 Header */}
-      <div className="directory-header">
-        <div className="directory-title-block">
-          <h1 className="section-title">
-            Registered Students Directory
-          </h1>
-          <p className="section-subtitle">
-            Browse, search, edit, and print official records for registered students.
-          </p>
+      {/* Directory Banner (Matching Exact Screenshot Layout) */}
+      <div className="directory-hero-banner">
+        <div className="banner-left">
+          <div className="banner-icon-box">
+            <Users className="w-6 h-6 text-white" />
+          </div>
+          <div className="banner-text">
+            <h1 className="banner-title">Registered Students Directory</h1>
+            <p className="banner-subtitle">
+              Browse, search, edit, and print official records for registered students.
+            </p>
+          </div>
         </div>
 
-        <div className="directory-actions">
+        <div className="banner-actions">
           <button
             type="button"
             id="btn-refresh-students"
             onClick={loadStudents}
             disabled={loading || !isConfigured}
-            className="btn-secondary"
+            className="banner-action-btn banner-btn-outline"
             title="Refresh student records"
             aria-label="Refresh student list"
           >
-            <RefreshCw className={`w-4 h-4 mr-1.5 ${loading ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`w-3.5 h-3.5 mr-1.5 ${loading ? 'animate-spin' : ''}`} />
             Refresh
           </button>
 
@@ -325,11 +335,11 @@ export const StudentDirectory: React.FC<Props> = ({
             id="btn-export-csv"
             onClick={handleExportCSV}
             disabled={filteredStudents.length === 0}
-            className="btn-secondary"
+            className="banner-action-btn banner-btn-outline"
             title="Download CSV of current list"
             aria-label="Export students to CSV"
           >
-            <Download className="w-4 h-4 mr-1.5" />
+            <Download className="w-3.5 h-3.5 mr-1.5" />
             Export CSV
           </button>
 
@@ -337,65 +347,68 @@ export const StudentDirectory: React.FC<Props> = ({
             type="button"
             id="btn-new-student-from-dir"
             onClick={onRegisterClick}
-            className="btn-primary"
+            className="banner-action-btn banner-btn-solid-purple"
             title="Register a new student"
             aria-label="New student registration"
           >
-            <Sparkles className="w-4 h-4 mr-1.5" />
+            <Plus className="w-4 h-4 mr-1" />
             New Student
           </button>
 
           <button
             type="button"
             onClick={handleLock}
-            className="btn-secondary lock-btn"
+            className="banner-action-btn banner-btn-outline"
             title="Lock Directory for privacy"
             aria-label="Lock student directory"
           >
-            <Lock className="w-4 h-4 mr-1.5 text-slate-400" />
-            <span>Lock</span>
+            <Lock className="w-3.5 h-3.5 mr-1.5" />
+            Lock
           </button>
         </div>
       </div>
 
-      {/* Directory Statistics (3 Professional Cards) */}
+      {/* 3 Directory Statistics Cards (Exact Matching Screenshot) */}
       <div className="metrics-grid">
-        <div className="metric-card">
-          <div className="metric-header-row">
+        {/* Card 1: Total Registered (Blue vertical accent line) */}
+        <div className="metric-card metric-card-blue">
+          <div className="metric-icon-circle bg-circle-blue">
+            <Users className="w-5 h-5 text-white" />
+          </div>
+          <div className="metric-content">
             <span className="metric-label">Total Registered</span>
-            <div className="metric-icon-wrap" aria-hidden="true">
-              <Users className="w-4 h-4 text-indigo-400" />
-            </div>
+            <span className="metric-value">{students.length}</span>
+            <span className="metric-sub">Active Records</span>
           </div>
-          <span className="metric-value">{students.length}</span>
-          <span className="metric-sub">Active Records</span>
         </div>
 
-        <div className="metric-card">
-          <div className="metric-header-row">
+        {/* Card 2: Active Programs (Teal vertical accent line) */}
+        <div className="metric-card metric-card-teal">
+          <div className="metric-icon-circle bg-circle-teal">
+            <GraduationCap className="w-5 h-5 text-white" />
+          </div>
+          <div className="metric-content">
             <span className="metric-label">Active Programs</span>
-            <div className="metric-icon-wrap" aria-hidden="true">
-              <BookOpen className="w-4 h-4 text-blue-400" />
-            </div>
+            <span className="metric-value">{uniqueCourses.length}</span>
+            <span className="metric-sub">Unique study fields</span>
           </div>
-          <span className="metric-value">{uniqueCourses.length}</span>
-          <span className="metric-sub">Unique study fields</span>
         </div>
 
-        <div className="metric-card">
-          <div className="metric-header-row">
-            <span className="metric-label">Filtered Results</span>
-            <div className="metric-icon-wrap" aria-hidden="true">
-              <Filter className="w-4 h-4 text-emerald-400" />
-            </div>
+        {/* Card 3: Filtered Results (Purple vertical accent line) */}
+        <div className="metric-card metric-card-purple">
+          <div className="metric-icon-circle bg-circle-purple">
+            <Filter className="w-5 h-5 text-white" />
           </div>
-          <span className="metric-value">{filteredStudents.length}</span>
-          <span className="metric-sub">Matching search criteria</span>
+          <div className="metric-content">
+            <span className="metric-label">Filtered Results</span>
+            <span className="metric-value">{filteredStudents.length}</span>
+            <span className="metric-sub">Matching search criteria</span>
+          </div>
         </div>
       </div>
 
-      {/* Search and Filter Section */}
-      <div className="search-filter-bar">
+      {/* Search and Filter Section (Row in Screenshot) */}
+      <div className="search-filter-row">
         <div className="search-input-wrapper">
           <Search className="search-icon" aria-hidden="true" />
           <input
@@ -436,6 +449,7 @@ export const StudentDirectory: React.FC<Props> = ({
               </option>
             ))}
           </select>
+          <ChevronDown className="filter-chevron" aria-hidden="true" />
         </div>
       </div>
 
@@ -459,13 +473,13 @@ export const StudentDirectory: React.FC<Props> = ({
       <div className="table-responsive-wrapper">
         {loading ? (
           <div className="table-loading-state">
-            <RefreshCw className="w-8 h-8 animate-spin text-indigo-400 mb-2" />
+            <RefreshCw className="w-7 h-7 animate-spin text-indigo-400 mb-2" />
             <p>Loading registered student records...</p>
           </div>
         ) : filteredStudents.length === 0 ? (
           <div className="empty-state">
             <div className="empty-icon-wrap">
-              <Users className="w-10 h-10 text-slate-500" />
+              <Users className="w-8 h-8 text-slate-500" />
             </div>
             <h3>No student records found</h3>
             <p>
@@ -478,9 +492,9 @@ export const StudentDirectory: React.FC<Props> = ({
                 type="button"
                 id="btn-empty-register"
                 onClick={onRegisterClick}
-                className="btn-primary mt-4"
+                className="banner-action-btn banner-btn-solid-purple mt-3"
               >
-                <Sparkles className="w-4 h-4 mr-1.5" />
+                <Plus className="w-4 h-4 mr-1" />
                 Register First Student
               </button>
             ) : (
@@ -490,7 +504,7 @@ export const StudentDirectory: React.FC<Props> = ({
                   setSearchQuery('');
                   setSelectedCourse('ALL');
                 }}
-                className="btn-secondary mt-4"
+                className="btn-secondary mt-3"
               >
                 Clear Search & Filters
               </button>
@@ -500,149 +514,149 @@ export const StudentDirectory: React.FC<Props> = ({
           <table className="student-table" id="students-data-table">
             <thead>
               <tr>
-                <th scope="col">Student</th>
-                <th scope="col">Student ID</th>
-                <th scope="col">Contact</th>
-                <th scope="col">Course / Term</th>
-                <th scope="col">Registered</th>
-                <th scope="col" className="text-right">Actions</th>
+                <th scope="col" style={{ width: '22%' }}>STUDENT</th>
+                <th scope="col" style={{ width: '16%' }}>STUDENT ID</th>
+                <th scope="col" style={{ width: '26%' }}>CONTACT</th>
+                <th scope="col" style={{ width: '18%' }}>COURSE / TERM</th>
+                <th scope="col" style={{ width: '10%' }}>REGISTERED</th>
+                <th scope="col" style={{ width: '8%', textAlign: 'right' }}>ACTIONS</th>
               </tr>
             </thead>
             <tbody>
-              {paginatedStudents.map((student) => (
-                <tr key={student.id} className="student-row">
-                  {/* Student identity cell */}
-                  <td>
-                    <div className="student-cell-identity">
-                      <div className="student-avatar" aria-hidden="true">
-                        {student.full_name.charAt(0).toUpperCase()}
-                      </div>
-                      <div className="student-names-col">
-                        <div className="student-name font-semibold">{student.full_name}</div>
-                        <div className="student-uuid" title={student.id}>
-                          Ref: {student.id.slice(0, 8)}...
+              {paginatedStudents.map((student, idx) => {
+                const avatarColorClass = AVATAR_COLORS[idx % AVATAR_COLORS.length];
+                return (
+                  <tr key={student.id} className="student-row">
+                    {/* Student identity cell */}
+                    <td>
+                      <div className="student-cell-identity">
+                        <div className={`student-avatar ${avatarColorClass}`} aria-hidden="true">
+                          {student.full_name.charAt(0).toUpperCase()}
+                        </div>
+                        <div className="student-names-col">
+                          <div className="student-name font-semibold">{student.full_name}</div>
+                          <div className="student-uuid" title={student.id}>
+                            Ref: {student.id.slice(0, 8)}...
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </td>
+                    </td>
 
-                  {/* Student ID pill */}
-                  <td>
-                    <span className="student-id-badge font-mono">
-                      <IdCard className="w-3.5 h-3.5 mr-1 text-indigo-400" />
-                      {student.student_id}
-                    </span>
-                  </td>
-
-                  {/* Contact cell */}
-                  <td>
-                    <div className="contact-cell-stack">
-                      <span className="student-email-link">
-                        <Mail className="w-3.5 h-3.5 mr-1 text-slate-400 flex-shrink-0" />
-                        <a href={`mailto:${student.email}`} title={`Email ${student.email}`}>
-                          {student.email}
-                        </a>
+                    {/* Student ID pill */}
+                    <td>
+                      <span className="student-id-pill font-mono">
+                        <IdCard className="w-3.5 h-3.5 mr-1.5 text-slate-400" />
+                        {student.student_id}
                       </span>
-                      {student.phone ? (
-                        <span className="student-phone-cell">
-                          <Phone className="w-3 h-3 mr-1 text-slate-500 flex-shrink-0" />
-                          <span>{student.phone}</span>
+                    </td>
+
+                    {/* Contact cell */}
+                    <td>
+                      <div className="contact-cell-stack">
+                        <span className="student-email-row">
+                          <Mail className="w-3.5 h-3.5 mr-1.5 text-slate-400 flex-shrink-0" />
+                          <a href={`mailto:${student.email}`} title={`Email ${student.email}`}>
+                            {student.email}
+                          </a>
                         </span>
-                      ) : (
-                        <span className="student-phone-cell text-muted">
-                          <Phone className="w-3 h-3 mr-1 text-slate-600 flex-shrink-0" />
-                          <span>No phone recorded</span>
+                        {student.phone ? (
+                          <span className="student-phone-row">
+                            <Phone className="w-3.5 h-3.5 mr-1.5 text-slate-400 flex-shrink-0" />
+                            <span>{student.phone}</span>
+                          </span>
+                        ) : (
+                          <span className="student-phone-row text-muted">
+                            <Phone className="w-3.5 h-3.5 mr-1.5 text-slate-500 flex-shrink-0" />
+                            <span>No phone recorded</span>
+                          </span>
+                        )}
+                      </div>
+                    </td>
+
+                    {/* Course / Term cell */}
+                    <td>
+                      <div className="course-term-stack">
+                        <span className="course-pill-purple">
+                          <GraduationCap className="w-3.5 h-3.5 mr-1.5 text-indigo-300" />
+                          <span>{student.course}</span>
                         </span>
-                      )}
-                    </div>
-                  </td>
+                        <span className="term-subtext">
+                          {student.academic_term || 'Fall 2026'}
+                        </span>
+                      </div>
+                    </td>
 
-                  {/* Course / Term cell */}
-                  <td>
-                    <div className="course-term-stack">
-                      <span className="course-badge">
-                        <GraduationCap className="w-3.5 h-3.5 mr-1 text-indigo-300" />
-                        <span>{student.course}</span>
+                    {/* Registered Date cell */}
+                    <td>
+                      <span className="date-cell">
+                        <Calendar className="w-3.5 h-3.5 mr-1.5 text-slate-400" />
+                        <span>
+                          {new Date(student.created_at).toLocaleDateString(undefined, {
+                            month: 'short',
+                            day: 'numeric',
+                            year: 'numeric',
+                          })}
+                        </span>
                       </span>
-                      <span className="term-sub-badge">
-                        {student.academic_term || 'Fall 2026'}
-                      </span>
-                    </div>
-                  </td>
+                    </td>
 
-                  {/* Registered Date cell */}
-                  <td>
-                    <span className="date-cell">
-                      <Calendar className="w-3.5 h-3.5 mr-1 text-slate-400" />
-                      <span>
-                        {new Date(student.created_at).toLocaleDateString(undefined, {
-                          month: 'short',
-                          day: 'numeric',
-                          year: 'numeric',
-                        })}
-                      </span>
-                    </span>
-                  </td>
+                    {/* Actions cell (Eye, Edit, Trash matching screenshot) */}
+                    <td>
+                      <div className="row-actions-group">
+                        <button
+                          type="button"
+                          onClick={() => setSlipStudent(student)}
+                          className="action-icon-pill action-view-pill"
+                          title="View Official Registration Slip"
+                          aria-label={`View slip for ${student.full_name}`}
+                        >
+                          <Eye className="w-3.5 h-3.5" />
+                        </button>
 
-                  {/* Actions cell */}
-                  <td>
-                    <div className="row-actions-group">
-                      <button
-                        type="button"
-                        onClick={() => setSlipStudent(student)}
-                        className="action-icon-btn slip-btn"
-                        title="View & Print Official Registration Slip"
-                        aria-label={`Print slip for ${student.full_name}`}
-                      >
-                        <Printer className="w-4 h-4" />
-                      </button>
+                        <button
+                          type="button"
+                          onClick={() => setEditStudent(student)}
+                          className="action-icon-pill action-edit-pill"
+                          title="Edit Student Record"
+                          aria-label={`Edit ${student.full_name}`}
+                        >
+                          <Edit2 className="w-3.5 h-3.5" />
+                        </button>
 
-                      <button
-                        type="button"
-                        onClick={() => setEditStudent(student)}
-                        className="action-icon-btn edit-btn"
-                        title="Edit Student Record"
-                        aria-label={`Edit ${student.full_name}`}
-                      >
-                        <Edit2 className="w-4 h-4" />
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={() => setDeleteTargetStudent(student)}
-                        className="action-icon-btn delete-btn"
-                        title="Delete Student Record"
-                        aria-label={`Delete ${student.full_name}`}
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
+                        <button
+                          type="button"
+                          onClick={() => setDeleteTargetStudent(student)}
+                          className="action-icon-pill action-delete-pill"
+                          title="Delete Student Record"
+                          aria-label={`Delete ${student.full_name}`}
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         )}
       </div>
 
-      {/* Pagination Footer */}
+      {/* Pagination Footer (Matching Screenshot) */}
       <div className="directory-footer-pagination">
         <div className="pagination-info">
-          Showing <span className="font-medium text-slate-200">{startIdx}</span>–
-          <span className="font-medium text-slate-200">{endIdx}</span> of{' '}
-          <span className="font-medium text-slate-200">{filteredStudents.length}</span> students
+          Showing {startIdx} – {endIdx} of {filteredStudents.length} students
         </div>
 
         <div className="pagination-controls">
           <button
             type="button"
-            className="pagination-btn"
+            className="pagination-arrow-btn"
             disabled={currentPage <= 1}
             onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
             aria-label="Previous page"
           >
-            <ChevronLeft className="w-4 h-4 mr-1" />
-            Previous
+            <ChevronLeft className="w-4 h-4" />
           </button>
 
           <div className="pagination-pages">
@@ -650,7 +664,7 @@ export const StudentDirectory: React.FC<Props> = ({
               <button
                 key={page}
                 type="button"
-                className={`page-num-btn ${page === currentPage ? 'active' : ''}`}
+                className={`pagination-square-btn ${page === currentPage ? 'active' : ''}`}
                 onClick={() => setCurrentPage(page)}
                 aria-label={`Page ${page}`}
                 aria-current={page === currentPage ? 'page' : undefined}
@@ -662,13 +676,12 @@ export const StudentDirectory: React.FC<Props> = ({
 
           <button
             type="button"
-            className="pagination-btn"
+            className="pagination-arrow-btn"
             disabled={currentPage >= totalPages}
             onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
             aria-label="Next page"
           >
-            Next
-            <ChevronRight className="w-4 h-4 ml-1" />
+            <ChevronRight className="w-4 h-4" />
           </button>
         </div>
       </div>
